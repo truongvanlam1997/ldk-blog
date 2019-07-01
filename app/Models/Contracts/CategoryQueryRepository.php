@@ -6,4 +6,6 @@ use App\Contracts\QueryRepository;
 interface CategoryQueryRepository extends QueryRepository
 {
     public function getListParentNames();
+    public function displayCategories();
+    public function getArrayCategories();
 }

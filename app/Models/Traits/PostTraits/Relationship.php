@@ -20,4 +20,8 @@ trait Relationship
     {
         return $this->belongsToMany(Tag::class, 'post_tags', 'post_id', 'tag_id');
     }
+    public function categories()
+    {
+        return $this->belongsHasMany(Category::class, 'Category_posts', 'post_id', 'category_id');
+    }
 }

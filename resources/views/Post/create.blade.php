@@ -33,23 +33,38 @@
             <div class="form-group">
                 <label for="description">{{__('Description')}}</label>
 
-                <textarea class="form-control " id="description" rows="5" name='description'
+                <textarea class="form-control " id="description" rows="8" name='description'
                     placeholder="Write a large text here ..."></textarea>
             </div>
         </div>
 
     </div>
     <div class="row">
-            <div class="col-5">
-                <div class="form-group">
-                    <label for="tag">{{__('Tag')}}</label>
-    
-                    <textarea class="form-control " id="tag" rows="3" name='tag'
-                        placeholder="Write tag separated by commas (,) "></textarea>
+        <div class="col-4">
+            <div class="form-group">
+                <div>
+                    <label for="category">{{__('Category')}}</label><br>
+                </div>
+                <div class="container bg-info text-white pt-20">
+
+                   {{$categoryModel->displayCategories($arrayCategories)}}
+
                 </div>
             </div>
-    
         </div>
+
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <div class="form-group">
+                <label for="tag">{{__('Tag')}}</label>
+
+                <textarea class="form-control " id="tag" rows="3" name='tag'
+                    placeholder="Write tag separated by commas (,) "></textarea>
+            </div>
+        </div>
+
+    </div>
 
 
     <div class="row">
@@ -65,7 +80,7 @@
 
             </div>
         </div>
-        
+
     </div>
     <div class="row">
 

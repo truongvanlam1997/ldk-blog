@@ -5,5 +5,5 @@ use App\Contracts\QueryRepository;
 
 interface PostTagQueryRepository extends QueryRepository
 {
-    public function updatePostTagTable($postId, array $tagIds);
+    public function insertPostTagTable($postId, array $tagIds);
 }

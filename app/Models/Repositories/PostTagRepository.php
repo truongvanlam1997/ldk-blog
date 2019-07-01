@@ -17,7 +17,7 @@ class PostTagRepository extends EloquentRepository implements PostTagQueryReposi
     {
         return PostTag::class;
     }
-    public function updatePostTagTable($postId, array $tagIds)
+    public function insertPostTagTable($postId, array $tagIds)
     {
         foreach ($tagIds as $tagId) {
             $this->model->insert(['post_id' => $postId,
