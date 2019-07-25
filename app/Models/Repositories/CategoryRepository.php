@@ -26,8 +26,8 @@ class CategoryRepository extends EloquentRepository implements CategoryQueryRepo
     {
         return $this ->model->getArrayCategories();
     }
-    public function displayCategories()
+    public function displayCategories(array $arrayCategories, $parent_id=0, $dem=0)
     {
-        return $this ->model->displayCategories();
+        return $this ->model->displayCategories($arrayCategories, $parent_id, $dem);
     }
 }

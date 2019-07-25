@@ -17,6 +17,8 @@ use App\Models\Contracts\CategoryPostQueryRepository;
 use App\Models\Repositories\CategoryRepository;
 use App\Models\Contracts\CategoryQueryRepository;
 
+use App\ServiceUpdateFiles\UpdateImage;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**

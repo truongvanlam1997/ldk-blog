@@ -6,6 +6,6 @@ use App\Contracts\QueryRepository;
 interface CategoryQueryRepository extends QueryRepository
 {
     public function getListParentNames();
-    public function displayCategories();
     public function getArrayCategories();
+    public function displayCategories(array $arrayCategories, $parent_id=0, $dem=0);
 }

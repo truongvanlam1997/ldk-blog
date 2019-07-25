@@ -16,10 +16,9 @@ class IndexController extends Controller
     }
     public function __invoke()
     {
-        $posts = $this->postqueryRepository->getAll();
-
-        $data= compact('posts');
-
+        $posts = $this->postqueryRepository->pagination();
+        $orderBy = [];
+        $data = compact('posts', 'orderBy');
         return view('post.index', $data);
     }
 }

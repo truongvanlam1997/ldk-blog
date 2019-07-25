@@ -3,6 +3,8 @@
 namespace App\Repositories;
 
 use App\Contracts\QueryRepository;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 
 abstract class EloquentRepository implements QueryRepository
 {
@@ -17,9 +19,28 @@ abstract class EloquentRepository implements QueryRepository
         $this->model = app()->make($this->getModel());
     }
 
-    public function pagination(array $criterial, int $limit = 15, int $page = 1)
+    public function pagination(array $criterial=[], array $orderBy=['id','asc'], int $limit = 5, int $page = 1)
     {
-        return $this->model->where($criterial)->paginate($limit);
+        // if ($criterial == null && $orderBy == null) {
+        //     return $this->model->paginate($limit);
+        // } elseif ($criterial == null) {
+        //     return $this->model->orderBy($orderBy)->paginate($limit);
+        // } elseif ($orderBy == null) {
+        //     return $this->model->where($criterial)->paginate($limit);
+        // } else {
+        //     return $this->model->where($criterial)->orderBy($orderBy)->paginate($limit);
+        // }
+        // dd($orderBy);
+        $model = $this->model;
+
+        if ($criterial) {
+            $model = $model->where($criterial);
+        }
+        if ($orderBy) {
+            $model = $model->orderBy($orderBy[0], $orderBy[1]);
+        }
+
+        return $model->paginate($limit);
     }
     
     public function getAll()
@@ -58,11 +79,61 @@ abstract class EloquentRepository implements QueryRepository
         $model= $this->model->find($id);
         $model->delete();
     }
+    
+    public function getAllTrash()
+    {
+        $model =$this->model;
+        $models  = $model->onlyTrashed()->get();
+        return $models;
+    }
+    public function restore($id)
+    {
+        $model =$this->model->where('id', $id);
+        $model->restore();
+    }
+    public function forceDelete($id)
+    {
+        $model = $this->model->where('id', $id);
+        $model->forceDelete();
+    }
+    public function clone($id)
+    {
+        $date = new \DateTime();
+        $date = $date->format('d_m_y h:m:s');
+        $model = $this->model->find($id);
+        $newModel = $model->replicate();
+        $newModel->title .= ' clone '.$date;
+        $newModel->save();
+    }
+    public function bulk(array $postIds, string $bulkAction)
+    {
+        if (isset($postIds) && isset($bulkAction)) {
+            foreach ($postIds as $index => $postId) {
+                $this->$bulkAction($postId);
+            }
+        }
+    }
+    public function search($searchTitle, $searchBy)
+    {
+        // return $this->model->where($searchBy, 'like', "%{$searchTitle}%")->get();
+        $criterial = [
+            [$searchBy, 'like', "%" .$searchTitle ."%"]
+        ];
+        return $this->pagination($criterial);
+    }
+    public function searchTrash($searchTitle, $searchBy)
+    {
+        return $this->model->onlyTrashed()->where($searchBy, 'like', '%{$searchTitle}%')->get();
+    }
+    public function sort($sortBy, $order)
+    {
+        $orderBy =[$sortBy , $order];
+        return $this->pagination([], $orderBy);
+    }
     public function getSlug(string $value)
     {
         $string = $this->coverStringToEnglish($value);
         $slug   = str_replace(" ", "-", $string);
-
         return $slug;
     }
     public function coverStringToEnglish(string $str)

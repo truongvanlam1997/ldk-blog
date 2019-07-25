@@ -1,143 +1,260 @@
 @extends('layouts.app')
-
 @section('content')
-<form action="{{ route('post.insert') }}" method="Post">
-    @csrf
-    <div class="row">
-        <div class="col-8">
-            <div class="form-group ">
-                <label for="title">{{__('Title')}}</label>
-                <input type="text" class="form-control" id="title" name='title'>
-            </div>
-        </div>
-        <div class="col-4">
-            <div class="form-group">
-                <label for="thumbnail">{{__('Thumbnail')}}</label>
-                <input type="file" class="form-control-file" id="thumbnail" name='thumbnail'>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-10 ">
-            <div class="form-group">
-                <label for="content">{{__('Content')}}</label>
-                <textarea class="form-control ckeditor" id="content" rows="10" name='content'
-                    placeholder="Write a large text here ..."></textarea>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-8">
-            <div class="form-group">
-                <label for="description">{{__('Description')}}</label>
-
-                <textarea class="form-control " id="description" rows="8" name='description'
-                    placeholder="Write a large text here ..."></textarea>
-            </div>
-        </div>
-
-    </div>
-    <div class="row">
-        <div class="col-4">
-            <div class="form-group">
-                <div>
-                    <label for="category">{{__('Category')}}</label><br>
-                </div>
-                <div class="container bg-info text-white pt-20">
-
-                   {{$categoryModel->displayCategories($arrayCategories)}}
-
-                </div>
-            </div>
-        </div>
-
-    </div>
-    <div class="row">
-        <div class="col-6">
-            <div class="form-group">
-                <label for="tag">{{__('Tag')}}</label>
-
-                <textarea class="form-control " id="tag" rows="3" name='tag'
-                    placeholder="Write tag separated by commas (,) "></textarea>
-            </div>
-        </div>
-
-    </div>
+<div class="container-fluid  ">
 
 
-    <div class="row">
-        <div class="col-4">
-            <div class="form-group">
-                <label for="status">{{__('Author')}}</label>
-                <select id="status" class="form-control" name=author_id>
-                    <option selected value="0">Choose...</option>
-                    @foreach ($authors as $author)
-                    <option value="{{$author->id}}">{{$author->name}}</option>
-                    @endforeach
-                </select>
+    <section class="content-header">
+        <h1>
+            {{ __('Create Post') }}
 
-            </div>
-        </div>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> {{ __('Home') }}</a></li>
+            <li class="active">{{ __('Create Post') }}</li>
+        </ol>
+    </section>
+    <script type="text/javascript">
+        function  readURL(input,thumbimage) {
+         if  (input.files && input.files[0]) { //Sử dụng  cho Firefox - chrome
+         var  reader = new FileReader();
+          reader.onload = function (e) {
+          $("#thumbimage").attr('src', e.target.result);
+           }
+           reader.readAsDataURL(input.files[0]);
+          }
+          else  { // Sử dụng cho IE
+            $("#thumbimage").attr('src', input.value);
+        
+          }
+          $("#thumbimage").show();
+          $('.filename').text($("#uploadfile").val());
+          $('.Choicefile').css('background', '#C4C4C4');
+          $('.Choicefile').css('cursor', 'default');
+          $(".removeimg").show();
+          $(".Choicefile").unbind('click'); //Xóa sự kiện  click trên nút .Choicefile
+                
+        }
+        $(document).ready(function () {
+         $(".Choicefile").bind('click', function  () { //Chọn file khi .Choicefile Click
+          $("#uploadfile").click();
+                     
+         });
+         $(".removeimg").click(function () {//Xóa hình  ảnh đang xem
+            $("#thumbimage").attr('src', '').hide();
+            $("#myfileupload").html('<input type="file" id="uploadfile"  onchange="readURL(this);" />');
+            $(".removeimg").hide();
+            $(".Choicefile").bind('click', function  () {//Tạo lại sự kiện click để chọn file
+             $("#uploadfile").click();
+            });
+            $('.Choicefile').css('background','#0877D8');
+            $('.Choicefile').css('cursor', 'pointer');
+            $(".filename").text("");
+          });
+         })
+      </script>
+    <style type="text/css">
+        .Choicefile
+         {
+          display:block;
+          background:#0877D8;
+          border:1px solid #fff;
+          color:#fff;
+          width:100px;
+          text-align:center;
+          text-decoration:none;
+          cursor:pointer;
+          padding:5px 0px;
+          }
+          #uploadfile,.removeimg
+          {
+           display:none;
+          }
+          #thumbbox
+          {
+           position:relative;
+           width:100px;
+          }
+          .removeimg
+          {
+          background:  url("http://png-3.findicons.com/files/icons/2181/34al_volume_3_2_se/24/001_05.png")  repeat scroll 0 0 transparent;
+          height: 24px;
+          position: absolute;
+          right: -285px;
+          top: 5px;
+          width: 24px;
+         
+          }
+       </style>
+  
+    <!-- Main content -->
+    <section class="content">
 
-    </div>
-    <div class="row">
+        <div class="row">
 
-        <div class="col-8">
-            <div class="form-group">
-                <label for="slug">{{__('Slug')}}</label>
-                <input type="text" class="form-control" id="slug" name='slug'>
-            </div>
-        </div>
+            <form action="{{ route('post.insert') }}" method="POST" enctype="multipart/form-data">
+                @csrf
 
-    </div>
-    <div class="row">
-        <div class="col-4">
+                <div class="col-md-8">
+                    <div class="row">
+                        {{-- <div class="col-md-4">
+                            @include('components.files.basic', [
+                            'name' => 'thumbnail',
+                            'label' => __('Thumbnail'),
+                            ])
+                        </div> --}}
+                        <div  style="padding-left:20px">
+                            <label> Thumbnail</label>
+                                <div id="myfileupload">
+                                    <input type="file" id="uploadfile" name="thumbnail" onchange="readURL(this);" />
+                                    <!--      Name  mà server request về sẽ là ImageUpload-->
+            
+                                </div>
+                                <div id="thumbbox">
+                                <img height="200px" width="400px"  alt="Thumb image" id="thumbimage" style="display:none" />
+                                    <a class="removeimg" href="javascript:"></a>
+                                </div>
+                                <div id="boxchoice">
+                                    <a href="javascript:" class="Choicefile">Chọn file</a>
+                                    <p style="clear:both"></p>
+                                </div>
+                               
+                            </div>
 
-            <div class="form-group">
-                <label for="status">{{__('Status')}}</label>
-                <select id="status" class="form-control" name=status>
-                    <option selected value="1">Choose...</option>
-                    <option value="1">Enable</option>
-                    <option value="0">Disable</option>
-                    <option value="2">Draft</option>
-                    <option value="3">Private</option>
-                </select>
-            </div>
-
-        </div>
-        <div class="col-4">
-            <div class="form-group ">
-                <label for="publish_at">{{__('Publish at')}}</label>
-                <div class="input-group input-group-alternative">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text"><i class="ni ni-calendar-grid-58"></i></span>
                     </div>
-                    <input data-provide="datepicker" class="form-control datepicker" name='published_at'
-                        placeholder="Select date" data-date-format="yyyy/mm/dd" value="">
+                    <div class="row">
+
+                        <div class="col-md-8">
+                            @include('components.inputs.basic', [
+                            'name' => 'title',
+                            'type' => 'text',
+                            'label' => __('Title'),
+                            'isRequired' => true,
+                            'default' => '',
+
+                            ])
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 ">
+                            @include('components.textarea.basic', [
+                            'name' => 'content',
+                            'label' => __('Content'),
+                            'isRequired' => true,
+                            'row' => 10,
+                            'default' => '',
+                            ])
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-10">
+                            @include('components.textarea.basic', [
+                            'name' => 'description',
+                            'label' => __('Description'),
+                            'row' => 5,
+                            'default' => '',
+                            ])
+                        </div>
+                    </div>
+
                 </div>
-            </div>
+                <div class="col-md-4">
+
+                    <div class="row">
+                        <div class="col-md-10">
+                            <div class="form-group">
+                                <div>
+                                    <div>
+                                        <label for="category">{{__('Category')}}</label><br>
+                                    </div>
+                                    <div class="container bg-info text-white pt-20">
+
+                                        {{$repositoryCategory->displayCategories($repositoryCategory->getArrayCategories()) }}
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-10">
+                            @include('components.textarea.basic', [
+                            'name' => 'tag',
+                            'label' => __('Tags'),
+                            'row' => 3,
+                            'default' => '',
+                            'placeholder' => 'Write tag separated by commas (,) '
+                            ])
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-md-8">
+
+                            @include('components.selects.basic', [
+                            'name' => 'author_id',
+                            'label' => __('Author'),
+                            'isRequired' => true,
+                            'default' => '',
+                            'options' => $authors,
+                            ])
+                        </div>
+
+                    </div>
+                    <div class="row">
+
+                        <div class="col-md-12">
+                            @include('components.inputs.basic', [
+                            'name' => 'slug',
+                            'type' => 'text',
+                            'label' => __('Slug'),
+                            'default' => '',
+                            ])
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-5">
+
+                            @include('components.selects.basic', [
+                            'name' => 'status',
+                            'label' => __('Status'),
+                            'isRequired' => true,
+                            'default' => '',
+                            'options' => ['0' => 'Enable', '1' => 'Disable', '3' =>'Draft','4' =>'Private']
+                            ])
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group ">
+                                <label for="publish_at">{{__('Publish at')}}</label>
+                                <div class="input-group input-group-alternative">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="ni ni-calendar-grid-58"></i></span>
+                                    </div>
+                                    <input data-provide="datepicker" class="form-control datepicker" name='published_at'
+                                        placeholder="Select date" data-date-format="yyyy/mm/dd" value="">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <button type="submit" class="btn btn-primary">{{__('Create')}}</button>
+                    </div>
+
+                </div>
+
+
+
+            </form>
         </div>
-
-    </div>
-
-
+    </section>
+</div>
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-    <button type="submit" class="btn btn-default">{{__('Create')}}</button>
-
-</form>
 @endsection

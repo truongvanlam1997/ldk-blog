@@ -16,7 +16,7 @@ class DeleteController extends Controller
     }
     public function __invoke($id)
     {
-        $this->postQueryRepository->delete($id);
-        return  redirect()->route('post.index');
+        $this->postQueryRepository->forceDelete($id);
+        return  redirect()->back();
     }
 }

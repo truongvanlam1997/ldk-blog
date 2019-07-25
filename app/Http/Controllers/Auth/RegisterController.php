@@ -7,6 +7,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use App\ServiceUpdateFiles\UpdateImage as UpdateImage;
+use Illuminate\Http\Request;
+use Illuminate\Auth\Events\Registered;
 
 class RegisterController extends Controller
 {
@@ -28,7 +31,8 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/post';
+    protected $pathAvatar;
 
     /**
      * Create a new controller instance.
@@ -46,12 +50,26 @@ class RegisterController extends Controller
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
+    public function register(Request $request)
+    {
+        // $this->pathAvatar = UpdateImage::UpdateImageUser($request['avatar'], $request['username']);
+        $this->validator($request->all())->validate();
+
+        event(new Registered($user = $this->create($request->all())));
+
+        $this->guard()->login($user);
+
+        return $this->registered($request, $user) ?: redirect($this->redirectPath());
+    }
     protected function validator(array $data)
     {
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'username' => ['required', 'string', 'min:3', 'unique:users'],
+            'avatar' => 'mimes:jpeg,jpg,png|min:5|max:1000',
+
         ]);
     }
 
@@ -63,10 +81,15 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+        $this->pathAvatar = isset($data['avatar']) ? UpdateImage::UpdateImageUser($data['avatar'], $data['username']) : UpdateImage::UpdateImageUser($data['avatar'] = null, $data['username']);
+
         return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
+            'username' => $data['username'],
+            'role_id' => 5,
             'password' => Hash::make($data['password']),
+            'avatar'  => $this->pathAvatar,
         ]);
     }
 }

@@ -16,6 +16,8 @@ use App\Models\Contracts\TagQueryRepository;
 use App\Models\Contracts\PostTagQueryRepository;
 use App\Models\Contracts\CategoryQueryRepository;
 use App\Models\Contracts\CategoryPostQueryRepository;
+use Illuminate\Support\Facades\Auth;
+use App\ServiceUpdateFiles\UpdateImage as UpdateImage;
 
 class CreateController extends Controller
 {
@@ -41,19 +43,18 @@ class CreateController extends Controller
         // $authors = $authorRepository->getAll() ;
         // $data = compact('authors');
       
-        $authors = $this->authorQueryRepository->getAll();
-        // $categories = $this->categoryQueryRepository->getAll();
-        $categoryModel =new Category();
-        $arrayCategories = $this->categoryQueryRepository->getArrayCategories();
-      
-
-        $data = compact('authors', 'categoryModel', 'arrayCategories');
+        $authors = $this->authorQueryRepository->getArrayAuthors();
+        $repositoryCategory = $this->categoryQueryRepository;
+        $data = compact('authors', 'repositoryCategory');
         return view('post.create', $data);
     }
     public function insert(Request $request)
     {
         $data = $request->all();
-       
+         
+        
+        $data['thumbnail'] = UpdateImage::UpdateImagePost($request->thumbnail, $request->title);
+
         if ($data['slug'] == null) {
             // $data['slug'] = $this->postQueryRepository->getSlug($data['title']);
             $data['slug'] = Str::slug($data['title'], '-');
@@ -65,7 +66,9 @@ class CreateController extends Controller
         $this->tagQueryRepository->updateTagByName($tag);
 
         // tạo 1 post mới . và trả về postId vừa tạo .
+       
         $postId = $this->postQueryRepository->insert($data);
+        
 
         // lưu tag vào bảng chung PostTags .
         $idTagOfPost = $this->tagQueryRepository->filterTagIdOfPost($tag); // Lấy danh sách id của các tag mới được thêm vào post

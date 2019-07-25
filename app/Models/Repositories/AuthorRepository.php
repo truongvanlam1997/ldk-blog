@@ -17,4 +17,8 @@ class AuthorRepository extends EloquentRepository implements AuthorQueryReposito
     {
         return Author::class;
     }
+    public function getArrayAuthors()
+    {
+        return $this->model->all()->pluck('name', 'id')->all();
+    }
 }
